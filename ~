@@ -1,0 +1,142 @@
+use uuid::Uuid;
+use chrono::DateTime;
+use chrono::Local;
+use chrono::FixedOffset;
+use chrono::Duration;
+use rustc_serialize::Encodable;
+use rustc_serialize::Decodable;
+use rustc_serialize::Encoder;
+use rustc_serialize::Decoder;
+
+#[derive(PartialEq, RustcEncodable,RustcDecodable)]
+pub struct Calendar {
+    pub id: Uuid,
+    pub name: String,
+    pub desc: String,
+    pub sync: bool,
+    events: Vec<Event>,
+}
+
+impl Calendar {
+    pub fn new(name: &str, desc: &str, sync: bool) -> Calendar {
+        Calendar {
+            id: Uuid::new_v4(),
+            name: name.to_string(),
+            desc: desc.to_string(),
+            sync: sync,
+            events: Vec::new(),
+        }
+    }
+
+    pub fn get_event(&self, id: &Uuid) -> Option<&Event> {
+        match self.events.iter().find(|x| &x.id == id) {
+            Some(i) => Some(i),
+            None => None,
+        }
+    }
+
+    pub fn add_event(&mut self, e: Event) {
+        self.events.push(e);
+    }
+
+    pub fn delete_event(&mut self, id: &Uuid) {
+        let index = match self.events.iter().position(|x| &x.id == id) {
+            Some(i) => i,
+            None => return,
+        };
+        self.events.remove(index);
+    }
+
+    pub fn repeat_event_n_times(&mut self, id: &Uuid, n: usize) {
+        let e = match self.events.iter().find(|x| &x.id == id) {
+            Some(i) => i.repeat(i.time.start + Duration::weeks(1)),
+            None => return,
+        };
+        for i in 0..n {
+            self.add_event(e.clone());
+
+            let e = e.repeat(e.time.start + Duration::weeks(1));
+        }
+    }    
+        
+
+    pub fn get_events(&self) -> &[Event] {
+        &self.events
+    }
+}
+
+#[derive(PartialEq, Clone, RustcEncodable, RustcDecodable)]
+pub struct Event {
+    pub id: Uuid,
+    pub name: String,
+    pub desc: String,
+    pub location: String,
+    pub time: Time,
+}
+
+impl Event {
+    pub fn new(name: &str, desc: &str, location: &str) -> Event {
+        Event {
+            id: Uuid::new_v4(),
+            name: name.to_string(),
+            desc: desc.to_string(),
+            location: location.to_string(),
+            time: Time::new(Local::now(), Local::now() + Duration::hours(1)),
+        }
+    }
+
+    pub fn repeat(&self, start: DateTime<Local>) -> Event {
+        Event {
+            id: Uuid::new_v4(),
+            name: self.name.clone(),
+            desc: self.desc.clone(),
+            location: self.location.clone(),
+            time: Time::new(start, start + (self.time.end - self.time.start)),
+        }
+    }
+}
+
+#[derive(PartialEq, Clone)]
+pub struct Time {
+    pub start: DateTime<Local>,
+    pub end: DateTime<Local>,
+}
+
+impl Time {
+    pub fn new(start: DateTime<Local>, end: DateTime<Local>) -> Time {
+        Time {
+            start: start.clone(),
+            end: end.clone(),
+        }
+    }
+}
+
+impl Encodable for Time { 
+    fn encode<S: Encoder>(&self, s: &mut S) -> Result<(), S::Error> {
+        s.emit_struct("Time", 0, |s| {
+            try!(s.emit_struct_field("start", 0, |s| (s.emit_str((self.start.to_rfc3339())))));
+            try!(s.emit_struct_field("end", 0, |s| (s.emit_str((self.end.to_rfc3339())))));
+            Ok(())
+        })
+    }
+}
+impl Decodable for Time { 
+    fn decode<D: Decoder>(d: &mut D) -> Result<Time, D::Error> {
+        let start = match d.read_str() {
+            Ok(i) => DateTime::parse_from_rfc3339(&i).unwrap(), 
+            Err(e) => return Err(e) };
+        let end = match d.read_str() {
+            Ok(i) => DateTime::parse_from_rfc3339(&i).unwrap(),
+            Err(e) => return Err(e) };
+        Ok(Time::new(start.with_timezone(&Local), end.with_timezone(&Local)))
+    }
+}
+/*
+impl Decodable for Event {
+    fn decode<D: Decoder>(d: &mut D) -> Result<Event, D::Error> {
+        let name = match d.read_str() { Ok(i) => i, Err(e) => return Err(e) };
+        let desc = match d.read_str() { Ok(i) => i, Err(e) => return Err(e) };
+        let loca = match d.read_str() { Ok(i) => i, Err(e) => return Err(e) };
+        Ok(Event::new(&name, &desc, &loca))
+    }
+}*/
