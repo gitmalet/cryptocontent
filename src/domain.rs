@@ -35,19 +35,26 @@ impl Calendar {
         }
     }
 
-    pub fn get_event(&self, id: &Uuid) -> Option<&Event> {
-        match self.events.iter().find(|x| &x.id == id) {
-            Some(i) => Some(i),
+    pub fn get_event(&self, id: &Uuid) -> Option<Event> {
+        match self.events.iter().find(|&x| x.id == *id) {
+            Some(i) => Some(i.clone()),
             None => None,
         }
     }
 
+    fn get_positione(&self, id: &Uuid) -> Option<usize> {
+        match self.events.iter().position(|&x| x.id == *id) {
+            Some(i) => Some(i),
+            None => None,
+        }
+
+    }
     pub fn add_event(&mut self, e: Event) {
         self.events.push(e);
     }
 
     pub fn delete_event(&mut self, id: &Uuid) {
-        let index = match self.events.iter().position(|x| &x.id == id) {
+        let index = match self.get_position(id) {
             Some(i) => i,
             None => return,
         };
@@ -64,8 +71,8 @@ impl Calendar {
 
             let e = e.repeat(e.start + Duration::weeks(1));
         }
-    }    
-        
+    }
+
 
     pub fn get_events(&self) -> &[Event] {
         &self.events
