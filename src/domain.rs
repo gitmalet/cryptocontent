@@ -13,8 +13,8 @@ use rustc_serialize::Decoder;
 /// This struct is used to store information about a single calendar,
 /// including the events in it.
 ///
-/// Events are stored in a HashMap, saved as Days containing a list of Events..
-#[derive(PartialEq, RustcEncodable,RustcDecodable)]
+/// Events are stored in a HashMap, saved as Days containing a list of Events.
+#[derive(Debug, PartialEq, RustcEncodable,RustcDecodable)]
 pub struct Calendar {
     pub id: Uuid,
     pub name: String,
@@ -23,7 +23,7 @@ pub struct Calendar {
     days: HashMap<Date<Local>, Vec<Event>>,
 }
 
-#[derive(PartialEq, Clone, RustcEncodable, RustcDecodable)]
+#[derive(Debug, PartialEq, Clone, RustcEncodable, RustcDecodable)]
 pub struct Event {
     pub id: Uuid,
     pub name: String,
@@ -72,7 +72,11 @@ impl Calendar {
         self.days.get_mut(&e.start.date()).unwrap().remove(index);
     }
 
-    pub fn repeat_event_n_times(&mut self, id: &Uuid, n: usize) {
+    pub fn repeat_event_n_times(&mut self, e: &Event, n: usize) {
+        for i in 0..n {
+            let er = e.repeat(e.start + Duration::weeks(1));
+            self.add_event(er);
+        }
     }
 }
 

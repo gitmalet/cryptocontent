@@ -6,5 +6,5 @@ pub fn encrypt(cal: &Calendar) -> Option<Vec<u8>>{
     if !(init()) {
         return None;
     };
-    return None;    
+    return None;
 }
