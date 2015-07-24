@@ -63,10 +63,9 @@ mod tests {
         let mut cal = Calendar::new("TestCalendar", "This is a test instance for calendar", true);
         let eve = Event::new("TestEvent", "This is a test instance for event", "There");
 
-        let id = eve.id;
         cal.add_event(eve.clone());
-        cal.repeat_event_n_times(&eve, 5);
-        assert_eq!(cal.get_events_by_day(&eve.start.date()).unwrap().len(), 6);
+        cal.repeat_event_n_times(&eve, 5usize);
+        assert_eq!(cal.get_events().len(), 6);
     }
 
     #[test]

@@ -47,6 +47,12 @@ impl Calendar {
         }
     }
 
+    pub fn get_events(&self) -> Vec<&Event> {
+        let d = self.days.values();
+        let e = d.flat_map(|d| d.into_iter()).collect::<Vec<_>>();
+        e
+    }
+
     pub fn get_events_by_day(&self, date: &Date<Local>) -> Option<&[Event]> {
         match self.days.get(date) {
             Some(d) => Some(d),
