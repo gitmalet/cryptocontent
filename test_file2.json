@@ -1,1 +1,0 @@
-{"id":"fd2e5cee-8e8a-4fea-8167-932a44ecc488","name":"TestEvent","desc":"This is a test instance for event","location":"There","start":{"datetime":{"date":{"ymdf":16510138},"time":{"secs":80989,"frac":413814572}},"offset":{"local_minus_utc":7200}},"end":{"datetime":{"date":{"ymdf":16510138},"time":{"secs":84589,"frac":413820943}},"offset":{"local_minus_utc":7200}}}
