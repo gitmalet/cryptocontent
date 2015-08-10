@@ -1,5 +1,5 @@
-#![feature(trace_macros)]
-trace_macros!(true);
+//#![feature(trace_macros)]
+//trace_macros!(true);
 
 extern crate chrono;
 extern crate uuid;
@@ -23,7 +23,7 @@ mod tests {
     use std::io::BufWriter;
     use cryptomanager;
     use std::error::Error;
-
+    use std::fs;
     #[test]
     fn test_calendar() {
         let cal = Calendar::new("TestCalendar", "This is a test instance for calendar", true);
@@ -108,6 +108,9 @@ mod tests {
         let mut dec: Event = json::decode(&enc).unwrap();
 
         assert_eq!(eve, dec);
+        fs::remove_file("/home/malet/dev/Rust/cryptocontent/test_file1.json");
+        fs::remove_file("/home/malet/dev/Rust/cryptocontent/test_file2.json");
+
     }
 
     #[test]
@@ -146,6 +149,7 @@ mod tests {
 
         dec.delete_event(&eve);
         assert!(dec.get_events_by_day(&eve.start.date()).unwrap().is_empty());
+        fs::remove_file("/home/malet/dev/Rust/cryptocontent/test_file1.json");
     }
 
     #[test]
