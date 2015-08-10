@@ -3,7 +3,6 @@ use uuid::Uuid;
 use chrono::Date;
 use chrono::DateTime;
 use chrono::Local;
-use chrono::FixedOffset;
 use chrono::Duration;
 use rustc_serialize::Encodable;
 use rustc_serialize::Decodable;
