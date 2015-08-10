@@ -4,8 +4,8 @@ version = "0.1.0"
 authors = ["malet <malet@gmx.at>"]
 
 [dependencies]
-uuid  = "0.1"
-rustc-serialize = "0.3.15"
+uuid  = "*"
+rustc-serialize = "*"
 sodiumoxide = "*"
 
 [dependencies.chrono]

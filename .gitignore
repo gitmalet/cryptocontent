@@ -3,3 +3,4 @@ Cargo.lock
 test_file1.json
 test_file2.json
 test_file3.json
+.*.swp
