@@ -21,7 +21,7 @@ mod tests {
     use std::path::Path;
     use std::io::Write;
     use std::io::BufWriter;
-    use cryptomanager;
+    use cryptomanager::CryptoManager;
     use std::error::Error;
     use std::fs;
     #[test]
@@ -158,6 +158,16 @@ mod tests {
         let eve = Event::new("TestEvent", "This is a test instance for event", "There");
         let id = eve.id;
 
-        cryptomanager::encrypt(&cal);
+        let cm = CryptoManager::new().unwrap();
+        let cipher = match cm.encrypt("hello world!") {
+            Some(s) => s,
+            None => panic!("Failed to encrypt"),
+        };
+        let plain = match cm.decrypt(&cipher) {
+            Some(s) => s,
+            None => panic!("Failed to decrypt"),
+        };
+
+        assert_eq!("hello world!".to_string(), plain);
     }
 }
