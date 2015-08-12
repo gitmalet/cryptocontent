@@ -108,8 +108,8 @@ mod tests {
         let mut dec: Event = json::decode(&enc).unwrap();
 
         assert_eq!(eve, dec);
-        fs::remove_file("/home/malet/dev/Rust/cryptocontent/test_file1.json");
-        fs::remove_file("/home/malet/dev/Rust/cryptocontent/test_file2.json");
+        fs::remove_file("/home/malet/dev/Rust/cryptocontent/test_file1.json").unwrap();
+        fs::remove_file("/home/malet/dev/Rust/cryptocontent/test_file2.json").unwrap();
 
     }
 
@@ -121,9 +121,7 @@ mod tests {
 
         //Testing Calendar with event in it
         cal.add_event(eve.clone());
-        //let pj = json::as_pretty_json(&cal);
-        //let mut enc = Vec::new();
-        //write!(&mut enc, pj);
+        
         let enc = match json::encode(&cal) {
             Ok(o) => o,
             Err(e) => panic!("Panic at encoding {},\nDescription: {},\nCause: {}", e, e.description(), match e.cause() {
@@ -149,16 +147,36 @@ mod tests {
 
         dec.delete_event(&eve);
         assert!(dec.get_events_by_day(&eve.start.date()).unwrap().is_empty());
-        fs::remove_file("/home/malet/dev/Rust/cryptocontent/test_file1.json");
+        fs::remove_file("/home/malet/dev/Rust/cryptocontent/test_file1.json").unwrap();
     }
 
     #[test]
     fn test_encrypt() {
-        let mut cal = Calendar::new("TestCalendar", "This is a test instance for calendar", true);
-        let eve = Event::new("TestEvent", "This is a test instance for event", "There");
-        let id = eve.id;
+        let cal = Calendar::new("TestCalendar", "This is a test instance for calendar", true);
 
-        let cm = CryptoManager::new().unwrap();
+        let cm = CryptoManager::new();
+        
+        let enc = match json::encode(&cal) {
+            Ok(o) => o,
+            Err(e) => panic!("Panic at encoding {}, Description: {}", e, e.description()),
+        };
+
+        let cipher = match cm.encrypt(&enc) {
+            Some(s) => s,
+            None => panic!("Failed to encrypt"),
+        };
+        let plain = match cm.decrypt(&cipher) {
+            Some(s) => s,
+            None => panic!("Failed to decrypt"),
+        };
+
+        assert_eq!(enc, plain);
+    }
+    
+    #[test]
+    fn test_encrypt_new_nonce() {
+        let mut cm = CryptoManager::new();
+        
         let cipher = match cm.encrypt("hello world!") {
             Some(s) => s,
             None => panic!("Failed to encrypt"),
@@ -169,5 +187,17 @@ mod tests {
         };
 
         assert_eq!("hello world!".to_string(), plain);
+
+        cm.new_nonce();
+        let cipher = match cm.encrypt("hello world! 2") {
+            Some(s) => s,
+            None => panic!("Failed to encrypt"),
+        };
+        let plain = match cm.decrypt(&cipher) {
+            Some(s) => s,
+            None => panic!("Failed to decrypt"),
+        };
+
+        assert_eq!("hello world! 2".to_string(), plain);
     }
 }

@@ -4,6 +4,7 @@ use sodiumoxide::crypto::secretbox;
 use domain::Calendar;
 use std::str;
 
+#[derive(Debug, RustcEncodable,RustcDecodable)]
 pub struct CryptoManager {
     pub key: secretbox::Key,
     pub nonce: secretbox::Nonce,
@@ -11,15 +12,17 @@ pub struct CryptoManager {
 
 impl CryptoManager {
     
-    pub fn new() -> Option<CryptoManager> {
-        if !(init()) {
-            return None;
-        };
+    pub fn new() -> CryptoManager {
+        init();
 
-        Some(CryptoManager {
+        CryptoManager {
             key: secretbox::gen_key(),
             nonce: secretbox::gen_nonce(),
-        })
+        }
+    }
+
+    pub fn new_nonce(&mut self) {
+        self.nonce = secretbox::gen_nonce();
     }
 
     pub fn encrypt(&self, plaintext: &str) -> Option<Vec<u8>> {
