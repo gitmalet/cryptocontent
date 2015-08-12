@@ -4,8 +4,6 @@ use chrono::Date;
 use chrono::DateTime;
 use chrono::Local;
 use chrono::Duration;
-use rustc_serialize::Encodable;
-use rustc_serialize::Decodable;
 use rustc_serialize::Encoder;
 use rustc_serialize::Decoder;
 
@@ -60,14 +58,14 @@ impl Calendar {
     }
 
     pub fn add_event(&mut self, e: Event) {
-        if(!(self.days.contains_key(&e.start.date()))) {
+        if !(self.days.contains_key(&e.start.date())) {
             self.days.insert(e.start.date(), Vec::new());
         }
-        let day = self.days.get_mut(&e.start.date()).unwrap().push(e);
+        self.days.get_mut(&e.start.date()).unwrap().push(e);
     }
 
     pub fn delete_event(&mut self, e: &Event) {
-        if(!(self.days.contains_key(&e.start.date()))) {
+        if !(self.days.contains_key(&e.start.date())) {
             return
         }
         let index = match self.days.get(&e.start.date()).unwrap().iter().position(|x| x.id == e.id) {
@@ -78,7 +76,7 @@ impl Calendar {
     }
 
     pub fn repeat_event_n_times(&mut self, e: &Event, n: usize) {
-        for i in 0..n {
+        for _ in 0..n {
             let er = e.repeat(e.start + Duration::weeks(1));
             self.add_event(er);
         }

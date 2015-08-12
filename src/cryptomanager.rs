@@ -1,8 +1,5 @@
 use sodiumoxide::init;
-use sodiumoxide::crypto;
 use sodiumoxide::crypto::secretbox;
-use domain::Calendar;
-use std::str;
 
 #[derive(Debug, RustcEncodable,RustcDecodable)]
 pub struct CryptoManager {
@@ -32,7 +29,7 @@ impl CryptoManager {
     pub fn decrypt(&self, ciphertext: &[u8]) -> Option<String> {
         let plain = match secretbox::open(ciphertext, &self.nonce, &self.key) {
             Ok(o) => o,
-            Err(e) => return None,
+            Err(_) => return None,
         };
         String::from_utf8(plain).ok()
     }

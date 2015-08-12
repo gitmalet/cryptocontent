@@ -6,8 +6,8 @@ extern crate uuid;
 extern crate rustc_serialize;
 extern crate sodiumoxide;
 
-mod domain;
-mod cryptomanager;
+pub mod domain;
+pub mod cryptomanager;
 
 #[cfg(test)]
 mod tests {
@@ -17,7 +17,6 @@ mod tests {
     use chrono::Duration;
     use rustc_serialize::json;
     use std::fs::OpenOptions;
-    use std::fs::File;
     use std::path::Path;
     use std::io::Write;
     use std::io::BufWriter;
@@ -74,9 +73,8 @@ mod tests {
 
     #[test]
     fn test_serialize() {
-        let mut cal = Calendar::new("TestCalendar", "This is a test instance for calendar", true);
+        let cal = Calendar::new("TestCalendar", "This is a test instance for calendar", true);
         let eve = Event::new("TestEvent", "This is a test instance for event", "There");
-        let id = eve.id;
 
         //Testing Calendar alone
         let enc = json::encode(&cal).unwrap();
@@ -88,9 +86,9 @@ mod tests {
         let file = options.open(path).unwrap();
         let mut writer = BufWriter::new(&file);
 
-        writer.write_all(&enc.clone().into_bytes());
+        writer.write_all(&enc.clone().into_bytes()).unwrap();
 
-        let mut dec: Calendar = json::decode(&enc).unwrap();
+        let dec: Calendar = json::decode(&enc).unwrap();
         assert_eq!(cal, dec);
 
         //Testing Event alone
@@ -103,9 +101,9 @@ mod tests {
         let file = options.open(path).unwrap();
         let mut writer = BufWriter::new(&file);
 
-        writer.write_all(&enc.clone().into_bytes());
+        writer.write_all(&enc.clone().into_bytes()).unwrap();
 
-        let mut dec: Event = json::decode(&enc).unwrap();
+        let dec: Event = json::decode(&enc).unwrap();
 
         assert_eq!(eve, dec);
         fs::remove_file("/home/malet/dev/Rust/cryptocontent/test_file1.json").unwrap();
@@ -117,7 +115,6 @@ mod tests {
     fn test_whole_serialize() {
         let mut cal = Calendar::new("TestCalendar", "This is a test instance for calendar", true);
         let eve = Event::new("TestEvent", "This is a test instance for event", "There");
-        let id = eve.id;
 
         //Testing Calendar with event in it
         cal.add_event(eve.clone());
@@ -136,7 +133,7 @@ mod tests {
         let path = Path::new("/home/malet/dev/Rust/cryptocontent/test_file3.json");
         let file = options.open(path).unwrap();
         let mut writer = BufWriter::new(&file);
-        writer.write_all(&enc.clone().into_bytes());
+        writer.write_all(&enc.clone().into_bytes()).unwrap();
 
         let mut dec: Calendar = match json::decode(&enc) {
             Ok(t) => t,
