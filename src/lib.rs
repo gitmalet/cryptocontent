@@ -6,7 +6,11 @@ extern crate uuid;
 extern crate rustc_serialize;
 extern crate sodiumoxide;
 
+/// This module contains all the data types that are used to store information. They are all
+/// serializeble and of course also deserializeble.
 pub mod domain;
+
+/// Module for encrypting and decrypting stuff.
 pub mod cryptomanager;
 
 #[cfg(test)]

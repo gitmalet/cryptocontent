@@ -20,6 +20,8 @@ pub struct Calendar {
     days: HashMap<Date<Local>, Vec<Event>>,
 }
 
+/// An Event stores information about, you guessed it, an event in time. They are to be stored in
+/// an instance of Calendar.
 #[derive(Debug, PartialEq, Clone, RustcEncodable, RustcDecodable)]
 pub struct Event {
     pub id: Uuid,
@@ -44,12 +46,15 @@ impl Calendar {
         }
     }
 
+    /// Returns a vector of all the events currently stored in this instance of Calendar.
     pub fn get_events(&self) -> Vec<&Event> {
         let d = self.days.values();
         let e = d.flat_map(|d| d.into_iter()).collect::<Vec<_>>();
         e
     }
 
+    /// Returns a slice of all the Events on the specified date. None if no event is saved for the
+    /// given date.
     pub fn get_events_by_day(&self, date: &Date<Local>) -> Option<&[Event]> {
         match self.days.get(date) {
             Some(d) => Some(d),
@@ -57,6 +62,8 @@ impl Calendar {
         }
     }
 
+    /// Stores an Event in the Calendar. If the date of the event isn't already a key in events
+    /// hashmap the key is generated and event is saved in it's value list.
     pub fn add_event(&mut self, e: Event) {
         if !(self.days.contains_key(&e.start.date())) {
             self.days.insert(e.start.date(), Vec::new());
@@ -64,6 +71,7 @@ impl Calendar {
         self.days.get_mut(&e.start.date()).unwrap().push(e);
     }
 
+    /// Deletes an Event in the Calendar. If the event is not found nothing happens.
     pub fn delete_event(&mut self, e: &Event) {
         if !(self.days.contains_key(&e.start.date())) {
             return
@@ -75,6 +83,7 @@ impl Calendar {
         self.days.get_mut(&e.start.date()).unwrap().remove(index);
     }
 
+    /// Repeats the event n times changing only the dates, with one week distance between them.
     pub fn repeat_event_n_times(&mut self, e: &Event, n: usize) {
         for _ in 0..n {
             let er = e.repeat(e.start + Duration::weeks(1));
@@ -96,6 +105,8 @@ impl Event {
         }
     }
 
+    /// Repeats the event, returning the new instance, starting at given date and time. The
+    /// difference between start and end date and time of the two events is the same.
     pub fn repeat(&self, start: DateTime<Local>) -> Event {
         Event {
             id: Uuid::new_v4(),
