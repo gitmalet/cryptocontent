@@ -177,7 +177,7 @@ mod tests {
     #[test]
     fn test_encrypt_new_nonce() {
         let mut cm = CryptoManager::new();
-        
+
         let cipher = match cm.encrypt("hello world!") {
             Some(s) => s,
             None => panic!("Failed to encrypt"),
