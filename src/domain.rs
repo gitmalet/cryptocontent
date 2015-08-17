@@ -33,6 +33,7 @@ pub struct Event {
 }
 
 impl Calendar {
+
     /// Function to create a new Calendar struct with name and description.
     /// The sync bit is there to determine if this calendar is to be synced with online storage or
     /// not.

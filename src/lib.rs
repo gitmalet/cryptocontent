@@ -1,5 +1,8 @@
-//#![feature(trace_macros)]
-//trace_macros!(true);
+//! CryptoContent is a library to store data at some cloud storage and manage it with multiple
+//! clients. 
+//! No server application is used for this purpose, so the clients have to manage everything. 
+//! The data stored on remote destinations by CryptoContent is encrypted.
+//! This library uses Sodium crypto libs for all the crypto primitives.
 
 extern crate chrono;
 extern crate uuid;
