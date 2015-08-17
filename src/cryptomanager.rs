@@ -2,12 +2,14 @@ use sodiumoxide::init;
 use sodiumoxide::crypto::secretbox;
 use sodiumoxide::crypto::box_;
 
-/// Struct containing the needed extra parameters for encrypting and decrypting operations.
-/// For encryption and decryption the Sodium library is used. The cipher suite and MAC functions
+/// Struct containing the needed parameters for crypto.
+/// For crypto primitives the Sodium library is used. The cipher suite and MAC functions
 /// are the defaults of Sodium for symmetric authenticated encryption.
 /// 
-/// This functions need a key that has to be secret and a nonce that has to be just unique but not
-/// secret.
+/// The struct contains a symmetric key and nonce for encrypting and decrypting the data itself.
+/// This key has to be stored to every device using this data.
+/// It also contains a public key, secret key and a asymmetric nonce for asymmetric encryption, this is unique per client
+/// and is used to exchange the secret key.
 #[derive(Debug, RustcEncodable, RustcDecodable)]
 pub struct CryptoManager {
     pub symkey: secretbox::Key,
@@ -21,7 +23,8 @@ pub struct CryptoManager {
 
 impl CryptoManager {
  
-    /// Generates a new CryptoManager, generating a random key and a random nonce
+    /// Generates a new CryptoManager, generating a random keys and nonces.
+    /// This should only be done once per client.
     pub fn new() -> CryptoManager {
         init();
 
@@ -38,6 +41,12 @@ impl CryptoManager {
             asymnonce: an,
             asymfirst: an,
         }
+    }
+
+    /// This function has to be called to ensure that crypto functions are thread-safe. The
+    /// constructor for CryptoManager calls this.
+    pub fn init() {
+        init();
     }
 
     /// Generates a new nonce and saves it in the CryptoManager. This has to be done before each
