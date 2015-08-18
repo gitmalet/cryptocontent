@@ -10,6 +10,10 @@ use sodiumoxide::crypto::box_;
 /// This key has to be stored to every device using this data.
 /// It also contains a public key, secret key and a asymmetric nonce for asymmetric encryption, this is unique per client
 /// and is used to exchange the secret key.
+///
+/// The exchange works like this:
+///
+/// ![Abstract overview of key exchange between two clients](../../../../doc/key-exchange-abstract.svg)
 #[derive(Debug, RustcEncodable, RustcDecodable)]
 pub struct CryptoManager {
     pub symkey: secretbox::Key,

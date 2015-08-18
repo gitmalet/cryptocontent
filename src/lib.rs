@@ -89,7 +89,7 @@ mod tests {
         let mut options = OpenOptions::new();
         options.write(true).truncate(true).create(true);
 
-        let path = Path::new("/home/malet/dev/Rust/cryptocontent/test_file1.json");
+        let path = Path::new("test_file1.json");
         let file = options.open(path).unwrap();
         let mut writer = BufWriter::new(&file);
 
@@ -104,7 +104,7 @@ mod tests {
         let mut options = OpenOptions::new();
         options.write(true).truncate(true).create(true);
 
-        let path = Path::new("/home/malet/dev/Rust/cryptocontent/test_file2.json");
+        let path = Path::new("test_file2.json");
         let file = options.open(path).unwrap();
         let mut writer = BufWriter::new(&file);
 
@@ -113,8 +113,8 @@ mod tests {
         let dec: Event = json::decode(&enc).unwrap();
 
         assert_eq!(eve, dec);
-        fs::remove_file("/home/malet/dev/Rust/cryptocontent/test_file1.json").unwrap();
-        fs::remove_file("/home/malet/dev/Rust/cryptocontent/test_file2.json").unwrap();
+        fs::remove_file("test_file1.json").unwrap();
+        fs::remove_file("test_file2.json").unwrap();
 
     }
 
@@ -137,7 +137,7 @@ mod tests {
         let mut options = OpenOptions::new();
         options.write(true).truncate(true).create(true);
 
-        let path = Path::new("/home/malet/dev/Rust/cryptocontent/test_file3.json");
+        let path = Path::new("test_file3.json");
         let file = options.open(path).unwrap();
         let mut writer = BufWriter::new(&file);
         writer.write_all(&enc.clone().into_bytes()).unwrap();
@@ -151,7 +151,7 @@ mod tests {
 
         dec.delete_event(&eve);
         assert!(dec.get_events_by_day(&eve.start.date()).unwrap().is_empty());
-        fs::remove_file("/home/malet/dev/Rust/cryptocontent/test_file1.json").unwrap();
+        fs::remove_file("test_file3.json").unwrap();
     }
 
     #[test]
