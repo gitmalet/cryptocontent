@@ -1,3 +1,4 @@
+#![feature(box_syntax)]
 //! CryptoContent is a library to store data at some cloud storage and manage it with multiple
 //! clients. 
 //! No server application is used for this purpose, so the clients have to manage everything. 
@@ -14,7 +15,10 @@ extern crate sodiumoxide;
 pub mod domain;
 
 /// Module for encrypting and decrypting stuff.
-pub mod cryptomanager;
+pub mod crypto;
+
+/// Module for managing storage
+pub mod storage;
 
 #[cfg(test)]
 mod tests {
@@ -27,9 +31,12 @@ mod tests {
     use std::path::Path;
     use std::io::Write;
     use std::io::BufWriter;
-    use cryptomanager::CryptoManager;
+    use std::io::BufReader;
+    use crypto::CryptoManager;
     use std::error::Error;
     use std::fs;
+    use storage::StorageManager;
+
     #[test]
     fn test_calendar() {
         let cal = Calendar::new("TestCalendar", "This is a test instance for calendar", true);
@@ -203,5 +210,23 @@ mod tests {
         };
 
         assert_eq!("hello world! 2".to_string(), plain);
+    }
+
+    #[test]
+    fn test_storage_manager() {
+        let cal = Calendar::new("TestCalendar", "This is a test instance for calendar", true);
+
+        let mut options = OpenOptions::new();
+        options.write(true).truncate(true).create(true);
+
+        let path = Path::new("test_file4.json");
+        let file = box options.open(path).unwrap();
+        let mut writer = box BufWriter::new(file);
+        //TODO: Do
+
+        let mut s = StorageManager::new(writer/*, reader*/);
+        s.save(cal);
+
+        fs::remove_file("test_file4.json").unwrap();
     }
 }

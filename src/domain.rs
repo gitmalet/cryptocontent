@@ -6,6 +6,11 @@ use chrono::Local;
 use chrono::Duration;
 use rustc_serialize::Encoder;
 use rustc_serialize::Decoder;
+use rustc_serialize::Encodable;
+
+pub struct Account {
+    pub items: Vec<Box<Encodable>>
+}
 
 /// This struct is used to store information about a single calendar,
 /// including the events in it.
