@@ -5,8 +5,10 @@ authors = ["malet <malet@gmx.at>"]
 
 [dependencies]
 uuid  = "*"
-rustc-serialize = "*"
 sodiumoxide = "*"
+serde = "*"
+serde_json = "*"
+serde_macros = "*"
 
 [dependencies.chrono]
 version = "*"
