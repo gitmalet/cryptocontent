@@ -101,13 +101,13 @@ impl Calendar {
     /// TODO: WTF Ownership madness
     pub fn add_event(&mut self, e: Event) {
         let mut date = DTWrapper::d_to_string(DTWrapper::to_date(e.start.clone()));
-        let mut d2 = date.clone();
+        //let mut d2 = date.clone();
 
-        if !(self.days.contains_key(&d2)) {
-            self.days.insert(date, Vec::new());
+        if !(self.days.contains_key(&date)) {
+            self.days.insert(date.clone(), Vec::new());
         }
 
-        self.days.get_mut(&d2).unwrap().push(e);
+        self.days.get_mut(&date).unwrap().push(e);
     }
 
     /// Deletes an Event in the Calendar. If the event is not found nothing happens.
