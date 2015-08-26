@@ -2,6 +2,8 @@ use sodiumoxide::init;
 use sodiumoxide::crypto::secretbox;
 use sodiumoxide::crypto::box_;
 
+//pub use sodiumoxide::crypto::secretbox::KEY;
+
 /// Struct containing the needed parameters for crypto.
 /// For crypto primitives the Sodium library is used. The cipher suite and MAC functions
 /// are the defaults of Sodium for symmetric authenticated encryption.
@@ -24,9 +26,12 @@ pub struct CryptoManager {
     pub asymnonce: box_::Nonce,
     asymfirst: box_::Nonce,
 }
-
+/*
+pub fn gen_key() -> KEY {
+    secretbox::gen_key()
+}
+*/
 impl CryptoManager {
- 
     /// Generates a new CryptoManager, generating a random keys and nonces.
     /// This should only be done once per client.
     pub fn new() -> CryptoManager {
@@ -38,7 +43,7 @@ impl CryptoManager {
 
         CryptoManager {
             symkey: secretbox::gen_key(),
-            symnonce: sn, 
+            symnonce: sn,
             symfirst: sn,
             pubkey: p,
             seckey: s,
@@ -54,14 +59,17 @@ impl CryptoManager {
     }
 
     /// Generates a new nonce and saves it in the CryptoManager. This has to be done before each
-    /// new encryption, because using the same nonce (think as not more than once) more than once is insecure. 
+    /// new encryption, because using the same nonce (think as Not more than ONCE) more than once is insecure. 
+    /// TODO: Don't generate everytime, just increase
     pub fn new_nonce(&mut self) {
         self.symnonce = secretbox::gen_nonce();
     }
 
-    /// Encrypts the str with key and current nonce
-    pub fn encrypt(&self, plaintext: &str) -> Option<Vec<u8>> {
+    /// Encrypts the str with key and new nonce
+    pub fn encrypt(&mut self, plaintext: &str) -> Option<Vec<u8>> {
         //TODO: Check for errors
+
+        self.new_nonce();
         Some(secretbox::seal(plaintext.as_bytes(), &self.symnonce, &self.symkey))
     }
 

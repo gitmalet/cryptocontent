@@ -36,7 +36,7 @@ mod tests {
     use crypto::CryptoManager;
     use std::error::Error;
     use std::fs;
-    use storage::StorageManager;
+    use storage::{load, save};
     use serde_json;
 
     #[test]
@@ -143,7 +143,7 @@ mod tests {
 
         //Testing Calendar with event in it
         cal.add_event(eve.clone());
-        
+
         let enc = serde_json::to_string(&cal).unwrap();
 
         let mut options = OpenOptions::new();
@@ -167,8 +167,8 @@ mod tests {
     fn test_encrypt() {
         let cal = Calendar::new("TestCalendar", "This is a test instance for calendar", true);
 
-        let cm = CryptoManager::new();
-        
+        let mut cm = CryptoManager::new();
+
         let enc = match serde_json::to_string(&cal) {
             Ok(o) => o,
             Err(e) => panic!("Encryption error: {}", e.description()),
@@ -185,7 +185,7 @@ mod tests {
 
         assert_eq!(enc, plain);
     }
-    
+
     #[test]
     fn test_encrypt_new_nonce() {
         let mut cm = CryptoManager::new();
@@ -215,20 +215,29 @@ mod tests {
     }
 
     #[test]
-    fn test_storage_manager() {
+    fn test_storage() {
         let cal = Calendar::new("TestCalendar", "This is a test instance for calendar", true);
+        let mut cm = CryptoManager::new();
 
         let mut options = OpenOptions::new();
         options.write(true).truncate(true).create(true);
 
         let path = Path::new("test_file4.json");
-        let file = box options.open(path).unwrap();
-        let mut writer = box BufWriter::new(file);
-        //TODO: Do
+        let wfile = options.open(path).unwrap();
+        let mut writer = BufWriter::new(wfile);
 
-        let mut s = StorageManager::new(writer/*, reader*/);
-        s.save(cal);
+        save(&mut writer, &mut cm, &cal);
 
+        drop(writer);
+
+        let path = Path::new("test_file4.json");
+        let mut options = OpenOptions::new();
+        options.read(true);
+        let rfile = options.open(path).unwrap();
+        let mut reader = BufReader::new(rfile);
+        let loadedcal = load(&cm, &mut reader);
+
+        assert_eq!(cal, loadedcal);
         fs::remove_file("test_file4.json").unwrap();
     }
 }

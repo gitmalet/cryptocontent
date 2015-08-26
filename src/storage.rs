@@ -2,30 +2,22 @@ use std::io::Write;
 use std::io::Read;
 use serde;
 use serde_json;
+use crypto::CryptoManager;
 
-//TODO: Fix to normal data instead of box
-pub struct StorageManager {
-    pub write_to: Box<Write>,
-    //pub read_from: Box<Read>,
+pub fn save<W: Write, S: serde::Serialize>(w: &mut W, c: &mut CryptoManager, s: &S) {
+    let enc = serde_json::to_string(s).unwrap();
+
+    //TODO: Encrypt
+    //TODO: Resolve unwrap
+    let enc = c.encrypt(&enc).unwrap();
+    w.write_all(&enc).unwrap();
 }
 
-impl StorageManager {
-    pub fn new(w: Box<Write>/*, r: Box<Read>*/) -> StorageManager {
-        StorageManager {
-            write_to: w,
-            //read_from: r,
-        }
-    }
+pub fn load<R: Read, D: serde::Deserialize>(c: &CryptoManager, r: &mut R) -> D {
+    let mut enc = Vec::new();
 
-    pub fn save<T: serde::Serialize>(&mut self, e: T) {
-        let enc = serde_json::to_string(&e).unwrap();
+    r.read_to_end(&mut enc);
+    let enc = c.decrypt(&enc).unwrap();
 
-        //TODO: Encrypt
-
-        self.write_to.write_all(&enc.into_bytes()).unwrap();
-    }
-/*
-    pub fn load<T: Decodable>(&self) -> T {
-        
-    }*/
+    serde_json::from_str(&enc).unwrap()
 }
