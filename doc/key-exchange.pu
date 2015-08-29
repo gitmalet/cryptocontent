@@ -1,0 +1,21 @@
+@startuml
+hide footbox
+
+skinparam sequence {
+	ArrowColor Black
+	LifeLineBorderColor Black
+	
+	ParticipantBorderColor Black
+	ParticipantBackgroundColor White
+	ParticipantFontName AnonymousPro
+	ParticipantFontSize 16
+	ParticipantFontColor Black
+}
+
+"Client 1" -> "Client 1": Generate symmetric key
+"Client 1" -> Server: Set up repo
+"Client 2" -> "Client 2": Generate asymmetric keypair
+"Client 2" -> Server: Upload public key
+"Client 1" -> Server: Retrieve new public keys and upload encrypted symkey
+"Client 2" -> Server: Retrieve encrypted symmetric key and decrypt it
+@enduml
