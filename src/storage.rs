@@ -17,7 +17,7 @@ pub fn load<R: Read, D: serde::Deserialize>(c: &CryptoManager, r: &mut R) -> D {
     let mut enc = Vec::new();
 
     r.read_to_end(&mut enc);
-    let enc = c.decrypt(&enc).unwrap();
+    let enc = c.decrypt(enc).unwrap();
 
     serde_json::from_str(&enc).unwrap()
 }

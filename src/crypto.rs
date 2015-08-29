@@ -31,6 +31,15 @@ pub fn gen_key() -> KEY {
     secretbox::gen_key()
 }
 */
+
+fn slice_to_array(barry: &[u8]) -> [u8; secretbox::NONCEBYTES] {
+    let mut array = [0u8; secretbox::NONCEBYTES];
+    for (&x, p) in barry.iter().zip(array.iter_mut()) {
+        *p = x;
+    }
+    array
+}
+
 impl CryptoManager {
     /// Generates a new CryptoManager, generating a random keys and nonces.
     /// This should only be done once per client.
@@ -70,13 +79,19 @@ impl CryptoManager {
         //TODO: Check for errors
 
         self.new_nonce();
-        Some(secretbox::seal(plaintext.as_bytes(), &self.symnonce, &self.symkey))
+        let mut ct = secretbox::seal(plaintext.as_bytes(), &self.symnonce, &self.symkey);
+        let secretbox::Nonce(nb) = self.symnonce.clone();
+        let mut out = nb.to_vec();
+        out.append(&mut ct);
+        Some(out)
     }
 
     /// Decrypts the ciphertext with key and nonce. Nonce and Key has to be the same for encryption and
     /// decryption
-    pub fn decrypt(&self, ciphertext: &[u8]) -> Option<String> {
-        let plain = match secretbox::open(ciphertext, &self.symnonce, &self.symkey) {
+    pub fn decrypt(&self, ciphertext: Vec<u8>) -> Option<String> {
+        let (nb, ciphertext) = ciphertext.split_at(secretbox::NONCEBYTES);
+        let nonce = slice_to_array(nb);
+        let plain = match secretbox::open(ciphertext, &secretbox::Nonce(nonce), &self.symkey) {
             Ok(o) => o,
             Err(_) => return None,
         };

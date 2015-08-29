@@ -1,4 +1,4 @@
-#![feature(box_syntax, custom_derive, plugin)]
+#![feature(box_syntax, custom_derive, plugin, append, split_off)]
 #![plugin(serde_macros)]
 //! CryptoContent is a library to store data at some cloud storage and manage it with multiple
 //! clients. 
@@ -174,11 +174,11 @@ mod tests {
             Err(e) => panic!("Encryption error: {}", e.description()),
         };
 
-        let cipher = match cm.encrypt(&enc) {
+        let mut cipher = match cm.encrypt(&enc) {
             Some(s) => s,
             None => panic!("Failed to encrypt"),
         };
-        let plain = match cm.decrypt(&cipher) {
+        let plain = match cm.decrypt(cipher) {
             Some(s) => s,
             None => panic!("Failed to decrypt"),
         };
@@ -194,7 +194,7 @@ mod tests {
             Some(s) => s,
             None => panic!("Failed to encrypt"),
         };
-        let plain = match cm.decrypt(&cipher) {
+        let plain = match cm.decrypt(cipher) {
             Some(s) => s,
             None => panic!("Failed to decrypt"),
         };
@@ -206,7 +206,7 @@ mod tests {
             Some(s) => s,
             None => panic!("Failed to encrypt"),
         };
-        let plain = match cm.decrypt(&cipher) {
+        let plain = match cm.decrypt(cipher) {
             Some(s) => s,
             None => panic!("Failed to decrypt"),
         };
