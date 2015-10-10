@@ -139,8 +139,6 @@ mod tests {
         let mut cal = Calendar::new("TestCalendar", "This is a test instance for calendar", true);
         let eve = Event::new("TestEvent", "This is a test instance for event", "There");
 
-        let enc = serde_json::to_string(&cal).unwrap();
-
         //Testing Calendar with event in it
         cal.add_event(eve.clone());
 
@@ -174,7 +172,7 @@ mod tests {
             Err(e) => panic!("Encryption error: {}", e.description()),
         };
 
-        let mut cipher = match cm.encrypt(&enc) {
+        let cipher = match cm.encrypt(&enc) {
             Some(s) => s,
             None => panic!("Failed to encrypt"),
         };

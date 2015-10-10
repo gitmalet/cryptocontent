@@ -11,30 +11,6 @@ pub struct Account {
     pub items: Vec<Box<serde::Serialize>>
 }
 
-pub struct DTWrapper;
-
-impl DTWrapper {
-    fn dt_to_string(date: DateTime<Local>) -> String {
-        return date.to_rfc3339();
-    }
-
-    fn d_to_string(date: Date<Local>) -> String {
-        return date.format("%Y-%m-%d").to_string();
-    }
-
-    fn to_datetime(str: String) -> DateTime<Local> {
-        let dt = match str.parse::<DateTime<Local>>() {
-            Ok(o) => return o,
-            Err(e) => panic!("Dateconversion failed: {}", e.description()),
-        };
-
-        return Local::now();
-    }
-
-    fn to_date(str: String) -> Date<Local> {
-       return DTWrapper::to_datetime(str).date();
-    }
-}
 
 /// This struct is used to store information about a single calendar,
 /// including the events in it.
@@ -85,7 +61,7 @@ impl Calendar {
     /// Returns a slice of all the Events on the specified date. None if no event is saved for the
     /// given date.
     pub fn get_events_by_day(&self, date: Date<Local>) -> Option<&[Event]> {
-        let mut date = DTWrapper::d_to_string(date);
+        let date = d_to_string(date);
 
         match self.days.get(&date) {
             Some(d) => Some(d),
@@ -97,7 +73,7 @@ impl Calendar {
     /// hashmap the key is generated and event is saved in it's value list.
     /// TODO: WTF Ownership madness
     pub fn add_event(&mut self, e: Event) {
-        let mut date = DTWrapper::d_to_string(DTWrapper::to_date(e.start.clone()));
+        let date = d_to_string(to_date(e.start.clone()));
         //let mut d2 = date.clone();
 
         if !(self.days.contains_key(&date)) {
@@ -109,7 +85,7 @@ impl Calendar {
 
     /// Deletes an Event in the Calendar. If the event is not found nothing happens.
     pub fn delete_event(&mut self, e: &Event) {
-        let mut date = DTWrapper::d_to_string(DTWrapper::to_date(e.start.clone()));
+        let date = d_to_string(to_date(e.start.clone()));
 
         if !(self.days.contains_key(&date)) {
             return
@@ -126,8 +102,6 @@ impl Calendar {
     /// Repeats the event n times changing only the dates, with one week distance between them.
     pub fn repeat_event_n_times(&mut self, e: &Event, n: usize) {
         for _ in 0..n {
-            let dt = DTWrapper::to_datetime(e.start.clone());
-
             let er = e.repeat(Duration::weeks(1));
             self.add_event(er);
         }
@@ -138,8 +112,8 @@ impl Calendar {
 impl Event {
     pub fn new(name: &str, desc: &str, location: &str) -> Event {
         // Is this correct Rust style? (starting a variable with underscore)
-        let mut _start = DTWrapper::dt_to_string(Local::now());
-        let mut _end = DTWrapper::dt_to_string(Local::now() + Duration::hours(1));
+        let mut _start = dt_to_string(Local::now());
+        let mut _end = dt_to_string(Local::now() + Duration::hours(1));
 
         Event {
             id: Uuid::new_v4().to_string(),
@@ -154,24 +128,43 @@ impl Event {
     /// Repeats the event, returning the new instance, starting at given date and time. The
     /// difference between start and end date and time of the two events is the same.
     pub fn repeat(&self, distance: Duration) -> Event {
-        let mut _start = DTWrapper::to_datetime(self.start.clone());
-        let mut _end = DTWrapper::to_datetime(self.end.clone());
+        let mut _start = to_datetime(self.start.clone());
+        let mut _end = to_datetime(self.end.clone());
 
         Event {
             id: Uuid::new_v4().to_string(),
             name: self.name.clone(),
             desc: self.desc.clone(),
             location: self.location.clone(),
-            start: DTWrapper::dt_to_string(_start + distance),
-            end: DTWrapper::dt_to_string(_start + distance + (_end - _start)),
+            start: dt_to_string(_start + distance),
+            end: dt_to_string(_start + distance + (_end - _start)),
         }
     }
 
     pub fn get_start(&self) -> DateTime<Local> {
-        return DTWrapper::to_datetime(self.start.clone());
+        return to_datetime(self.start.clone());
     }
 
     pub fn get_end(&self) -> DateTime<Local> {
-        return DTWrapper::to_datetime(self.end.clone());
+        return to_datetime(self.end.clone());
     }
+}
+
+fn dt_to_string(date: DateTime<Local>) -> String {
+    date.to_rfc3339()
+}
+
+fn d_to_string(date: Date<Local>) -> String {
+    date.format("%Y-%m-%d").to_string()
+}
+
+fn to_datetime(s: String) -> DateTime<Local> {
+    match s.parse::<DateTime<Local>>() {
+        Ok(o) => return o,
+        Err(e) => panic!("Dateconversion failed: {}", e.description()),
+    };
+}
+
+fn to_date(s: String) -> Date<Local> {
+   to_datetime(s).date()
 }
