@@ -1,6 +1,6 @@
 # Storage
 * ~~implement crypto~~
-* implement nonce saving
+* ~~implement nonce saving~~
 * implement plugin management
 * implement scp/ftp/Dropbox
 

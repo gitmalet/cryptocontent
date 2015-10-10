@@ -7,7 +7,7 @@ use sodiumoxide::crypto::box_;
 /// Struct containing the needed parameters for crypto.
 /// For crypto primitives the Sodium library is used. The cipher suite and MAC functions
 /// are the defaults of Sodium for symmetric authenticated encryption.
-/// 
+///
 /// The struct contains a symmetric key and nonce for encrypting and decrypting the data itself.
 /// This key has to be stored to every device using this data.
 /// It also contains a public key, secret key and a asymmetric nonce for asymmetric encryption, this is unique per client
@@ -68,7 +68,7 @@ impl CryptoManager {
     }
 
     /// Generates a new nonce and saves it in the CryptoManager. This has to be done before each
-    /// new encryption, because using the same nonce (think as Not more than ONCE) more than once is insecure. 
+    /// new encryption, because using the same nonce (think as Not more than ONCE) more than once is insecure.
     /// TODO: Don't generate everytime, just increase
     pub fn new_nonce(&mut self) {
         self.symnonce = secretbox::gen_nonce();

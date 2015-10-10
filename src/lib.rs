@@ -1,8 +1,8 @@
-#![feature(box_syntax, custom_derive, plugin, append, split_off)]
+#![feature(box_syntax, custom_derive, plugin)]
 #![plugin(serde_macros)]
 //! CryptoContent is a library to store data at some cloud storage and manage it with multiple
-//! clients. 
-//! No server application is used for this purpose, so the clients have to manage everything. 
+//! clients.
+//! No server application is used for this purpose, so the clients have to manage everything.
 //! The data stored on remote destinations by CryptoContent is encrypted.
 //! This library uses Sodium crypto libs for all the crypto primitives.
 

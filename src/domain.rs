@@ -1,23 +1,21 @@
 use std::collections::HashMap;
-use std::ptr::null;
 use std::error::Error;
 use uuid::Uuid;
 use chrono::Date;
 use chrono::DateTime;
 use chrono::Local;
 use chrono::Duration;
-use chrono::offset::TimeZone;
 use serde;
 
 pub struct Account {
     pub items: Vec<Box<serde::Serialize>>
 }
 
-pub struct DTWrapper; 
+pub struct DTWrapper;
 
 impl DTWrapper {
     fn dt_to_string(date: DateTime<Local>) -> String {
-        return date.to_rfc3339(); 
+        return date.to_rfc3339();
     }
 
     fn d_to_string(date: Date<Local>) -> String {
@@ -81,8 +79,7 @@ impl Calendar {
     /// Returns a vector of all the events currently stored in this instance of Calendar.
     pub fn get_events(&self) -> Vec<&Event> {
         let d = self.days.values();
-        let e = d.flat_map(|d| d.into_iter()).collect::<Vec<_>>();
-        e
+        d.flat_map(|d| d.into_iter()).collect::<Vec<_>>()
     }
 
     /// Returns a slice of all the Events on the specified date. None if no event is saved for the
