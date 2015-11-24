@@ -60,7 +60,7 @@ mod tests {
         assert!(e2.desc == "This is a test instance for event");
         assert!(e2.location == "There");
 
-        assert_eq!(e2.get_start() - eve.get_start(), Duration::weeks(1));
+        assert_eq!(e2.start - eve.start, Duration::weeks(1));
     }
 
     #[test]
@@ -69,12 +69,12 @@ mod tests {
         let eve = Event::new("TestEvent", "This is a test instance for event", "There");
 
         cal.add_event(eve.clone());
-        assert!(cal.get_events_by_day(eve.get_start().date()).unwrap()[0].id == eve.id);
+        assert!(cal.get_events_by_day(eve.start.date()).unwrap()[0].id == eve.id);
 
-        assert!(cal.get_events_by_day(eve.get_start().date()).unwrap()[0].name == "TestEvent");
+        assert!(cal.get_events_by_day(eve.start.date()).unwrap()[0].name == "TestEvent");
 
         cal.delete_event(&eve);
-        assert!(cal.get_events_by_day(eve.get_start().date()).unwrap().is_empty());
+        assert!(cal.get_events_by_day(eve.start.date()).unwrap().is_empty());
     }
 
     #[test]
@@ -154,10 +154,10 @@ mod tests {
 
         let mut dec: Calendar = serde_json::from_str(&enc).unwrap();
 
-        assert_eq!(dec.get_events_by_day(eve.get_start().date()).unwrap()[0].name, "TestEvent");
+        assert_eq!(dec.get_events_by_day(eve.start.date()).unwrap()[0].name, "TestEvent");
 
         dec.delete_event(&eve);
-        assert!(dec.get_events_by_day(eve.get_start().date()).unwrap().is_empty());
+        assert!(dec.get_events_by_day(eve.start.date()).unwrap().is_empty());
         fs::remove_file("test_file3.json").unwrap();
     }
 

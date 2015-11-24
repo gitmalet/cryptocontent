@@ -22,7 +22,7 @@ pub struct Calendar {
     pub name: String,
     pub desc: String,
     pub sync: bool,
-    days: HashMap<String, Vec<Event>>,
+    days: HashMap<DateTime<Local>, Vec<Event>>,
 }
 
 /// An Event stores information about, you guessed it, an event in time. They are to be stored in
@@ -33,10 +33,12 @@ pub struct Event {
     pub name: String,
     pub desc: String,
     pub location: String,
-    pub start: String,
-    pub end: String,
+    pub start: DateTime<Local>,
+    pub end: DateTime<Local>,
 }
 
+/// In Calendar the Hashmaps uses DateTime<Local> as keys, because they have serde support. If
+/// Date<Local> gets serde support, this should be used.
 impl Calendar {
 
     /// Function to create a new Calendar struct with name and description.
@@ -61,7 +63,7 @@ impl Calendar {
     /// Returns a slice of all the Events on the specified date. None if no event is saved for the
     /// given date.
     pub fn get_events_by_day(&self, date: Date<Local>) -> Option<&[Event]> {
-        let date = d_to_string(date);
+        let date = date.and_hms(0, 0, 0);
 
         match self.days.get(&date) {
             Some(d) => Some(d),
@@ -73,8 +75,7 @@ impl Calendar {
     /// hashmap the key is generated and event is saved in it's value list.
     /// TODO: WTF Ownership madness
     pub fn add_event(&mut self, e: Event) {
-        let date = d_to_string(to_date(e.start.clone()));
-        //let mut d2 = date.clone();
+        let date = e.start.date().and_hms(0, 0, 0);
 
         if !(self.days.contains_key(&date)) {
             self.days.insert(date.clone(), Vec::new());
@@ -85,7 +86,7 @@ impl Calendar {
 
     /// Deletes an Event in the Calendar. If the event is not found nothing happens.
     pub fn delete_event(&mut self, e: &Event) {
-        let date = d_to_string(to_date(e.start.clone()));
+        let date = e.start.date().clone().and_hms(0, 0, 0);
 
         if !(self.days.contains_key(&date)) {
             return
@@ -111,60 +112,28 @@ impl Calendar {
 
 impl Event {
     pub fn new(name: &str, desc: &str, location: &str) -> Event {
-        // Is this correct Rust style? (starting a variable with underscore)
-        let mut _start = dt_to_string(Local::now());
-        let mut _end = dt_to_string(Local::now() + Duration::hours(1));
 
         Event {
             id: Uuid::new_v4().to_string(),
             name: name.to_string(),
             desc: desc.to_string(),
             location: location.to_string(),
-            start: _start,
-            end: _end,
+            start: Local::now(),
+            end: Local::now() + Duration::hours(1),
         }
     }
 
     /// Repeats the event, returning the new instance, starting at given date and time. The
     /// difference between start and end date and time of the two events is the same.
     pub fn repeat(&self, distance: Duration) -> Event {
-        let mut _start = to_datetime(self.start.clone());
-        let mut _end = to_datetime(self.end.clone());
 
         Event {
             id: Uuid::new_v4().to_string(),
             name: self.name.clone(),
             desc: self.desc.clone(),
             location: self.location.clone(),
-            start: dt_to_string(_start + distance),
-            end: dt_to_string(_start + distance + (_end - _start)),
+            start: self.start + distance,
+            end: self.start + distance + (self.end - self.start),
         }
     }
-
-    pub fn get_start(&self) -> DateTime<Local> {
-        return to_datetime(self.start.clone());
-    }
-
-    pub fn get_end(&self) -> DateTime<Local> {
-        return to_datetime(self.end.clone());
-    }
-}
-
-fn dt_to_string(date: DateTime<Local>) -> String {
-    date.to_rfc3339()
-}
-
-fn d_to_string(date: Date<Local>) -> String {
-    date.format("%Y-%m-%d").to_string()
-}
-
-fn to_datetime(s: String) -> DateTime<Local> {
-    match s.parse::<DateTime<Local>>() {
-        Ok(o) => return o,
-        Err(e) => panic!("Dateconversion failed: {}", e.description()),
-    };
-}
-
-fn to_date(s: String) -> Date<Local> {
-   to_datetime(s).date()
 }

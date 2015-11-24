@@ -4,12 +4,12 @@ version = "0.1.0"
 authors = ["malet <malet@gmx.at>"]
 
 [dependencies]
-uuid  = "*"
-sodiumoxide = "*"
-serde = "*"
-serde_json = "*"
-serde_macros = "*"
+uuid  = "0.1.18"
+sodiumoxide = "0.0.9"
+serde = "0.6.1"
+serde_json = "0.6.0"
+serde_macros = "0.6.1"
 
 [dependencies.chrono]
-version = "*"
-features = ["rustc-serialize"]
+version = "0.2.17"
+features = ["serde"]
