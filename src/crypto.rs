@@ -16,7 +16,7 @@ use sodiumoxide::crypto::box_;
 /// The exchange works like this:
 ///
 /// ![Abstract overview of key exchange between two clients](../../../../doc/key-exchange-abstract.svg)
-#[derive(Debug, Serializeable, Deserializeable)]
+#[derive(Debug, RustcEncodable, RustcDecodable)]
 pub struct CryptoManager {
     pub symkey: secretbox::Key,
     pub symnonce: secretbox::Nonce,

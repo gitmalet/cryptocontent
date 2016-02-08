@@ -1,14 +1,12 @@
 use std::collections::HashMap;
-use std::error::Error;
 use uuid::Uuid;
 use chrono::Date;
 use chrono::DateTime;
 use chrono::Local;
 use chrono::Duration;
-use serde;
 
 pub struct Account {
-    pub items: Vec<Box<serde::Serialize>>
+    pub items: Vec<Calendar>
 }
 
 
@@ -16,18 +14,18 @@ pub struct Account {
 /// including the events in it.
 ///
 /// Events are stored in a HashMap, saved as Days containing a list of Events.
-#[derive(Debug, PartialEq, Serialize, Deserialize)]
+#[derive(Debug, PartialEq, RustcEncodable, RustcDecodable)]
 pub struct Calendar {
     pub id: String,
     pub name: String,
     pub desc: String,
     pub sync: bool,
-    days: HashMap<DateTime<Local>, Vec<Event>>,
+    days: HashMap<String, Vec<Event>>,
 }
 
 /// An Event stores information about, you guessed it, an event in time. They are to be stored in
 /// an instance of Calendar.
-#[derive(Debug, PartialEq, Clone, Serialize, Deserialize)]
+#[derive(Debug, PartialEq, Clone, RustcEncodable, RustcDecodable)]
 pub struct Event {
     pub id: String,
     pub name: String,
@@ -35,6 +33,7 @@ pub struct Event {
     pub location: String,
     pub start: DateTime<Local>,
     pub end: DateTime<Local>,
+    pub sync: bool,
 }
 
 /// In Calendar the Hashmaps uses DateTime<Local> as keys, because they have serde support. If
@@ -63,7 +62,7 @@ impl Calendar {
     /// Returns a slice of all the Events on the specified date. None if no event is saved for the
     /// given date.
     pub fn get_events_by_day(&self, date: Date<Local>) -> Option<&[Event]> {
-        let date = date.and_hms(0, 0, 0);
+        let date = date.and_hms(0, 0, 0).to_string();
 
         match self.days.get(&date) {
             Some(d) => Some(d),
@@ -75,10 +74,10 @@ impl Calendar {
     /// hashmap the key is generated and event is saved in it's value list.
     /// TODO: WTF Ownership madness
     pub fn add_event(&mut self, e: Event) {
-        let date = e.start.date().and_hms(0, 0, 0);
+        let date = e.start.date().and_hms(0, 0, 0).to_string();
 
         if !(self.days.contains_key(&date)) {
-            self.days.insert(date.clone(), Vec::new());
+            self.days.insert(date.clone().to_string(), Vec::new());
         }
 
         self.days.get_mut(&date).unwrap().push(e);
@@ -86,7 +85,7 @@ impl Calendar {
 
     /// Deletes an Event in the Calendar. If the event is not found nothing happens.
     pub fn delete_event(&mut self, e: &Event) {
-        let date = e.start.date().clone().and_hms(0, 0, 0);
+        let date = e.start.date().clone().and_hms(0, 0, 0).to_string();
 
         if !(self.days.contains_key(&date)) {
             return
@@ -112,7 +111,6 @@ impl Calendar {
 
 impl Event {
     pub fn new(name: &str, desc: &str, location: &str) -> Event {
-
         Event {
             id: Uuid::new_v4().to_string(),
             name: name.to_string(),
@@ -120,6 +118,7 @@ impl Event {
             location: location.to_string(),
             start: Local::now(),
             end: Local::now() + Duration::hours(1),
+            sync: false,
         }
     }
 
@@ -134,6 +133,7 @@ impl Event {
             location: self.location.clone(),
             start: self.start + distance,
             end: self.start + distance + (self.end - self.start),
+            sync: false,
         }
     }
 }

@@ -1,11 +1,10 @@
 use std::io::Write;
 use std::io::Read;
-use serde;
-use serde_json;
 use crypto::CryptoManager;
+use rustc_serialize::{Encodable, Decodable, json};
 
-pub fn save<W: Write, S: serde::Serialize>(w: &mut W, c: &mut CryptoManager, s: &S) {
-    let enc = serde_json::to_string(s).unwrap();
+pub fn save<W: Write, S: Encodable>(w: &mut W, c: &mut CryptoManager, s: &S) {
+    let enc = json::encode(s).unwrap();
 
     //TODO: Encrypt
     //TODO: Resolve unwrap
@@ -13,11 +12,11 @@ pub fn save<W: Write, S: serde::Serialize>(w: &mut W, c: &mut CryptoManager, s: 
     w.write_all(&enc).unwrap();
 }
 
-pub fn load<R: Read, D: serde::Deserialize>(c: &CryptoManager, r: &mut R) -> D {
+pub fn load<R: Read, D: Decodable>(c: &CryptoManager, r: &mut R) -> D {
     let mut enc = Vec::new();
 
     r.read_to_end(&mut enc).unwrap();
     let enc = c.decrypt(enc).unwrap();
 
-    serde_json::from_str(&enc).unwrap()
+    json::decode(&enc).unwrap()
 }

@@ -1,5 +1,4 @@
-#![feature(box_syntax, custom_derive, plugin)]
-#![plugin(serde_macros)]
+#![feature(box_syntax)]
 //! CryptoContent is a library to store data at some cloud storage and manage it with multiple
 //! clients.
 //! No server application is used for this purpose, so the clients have to manage everything.
@@ -8,9 +7,8 @@
 
 extern crate chrono;
 extern crate uuid;
-extern crate serde;
-extern crate serde_json;
 extern crate sodiumoxide;
+extern crate rustc_serialize;
 
 /// This module contains all the data types that are used to store information. They are all
 /// serializeble and of course also deserializeble.
@@ -37,7 +35,7 @@ mod tests {
     use std::error::Error;
     use std::fs;
     use storage::{load, save};
-    use serde_json;
+    use rustc_serialize::json;
 
     #[test]
     fn test_calendar() {
@@ -93,7 +91,7 @@ mod tests {
         let eve = Event::new("TestEvent", "This is a test instance for event", "There");
 
         //Testing Calendar alone
-        let enc = match serde_json::to_string(&cal) {
+        let enc = match json::encode(&cal) {
             Ok(o) => o,
             Err(e) => panic!("Encryption error! {}", e.description()),
         };
@@ -107,7 +105,7 @@ mod tests {
 
         writer.write_all(&enc.clone().into_bytes()).unwrap();
 
-        let dec: Calendar = match serde_json::from_str(&enc) {
+        let dec: Calendar = match json::decode(&enc) {
             Ok(o) => o,
             Err(e) => panic!("Decryption failed! {} on {}", e.description(), enc),
         };
@@ -115,7 +113,7 @@ mod tests {
         assert_eq!(cal, dec);
 
         //Testing Event alone
-        let enc = serde_json::to_string(&eve).unwrap();
+        let enc = json::encode(&eve).unwrap();
 
         let mut options = OpenOptions::new();
         options.write(true).truncate(true).create(true);
@@ -126,7 +124,7 @@ mod tests {
 
         writer.write_all(&enc.clone().into_bytes()).unwrap();
 
-        let dec: Event = serde_json::from_str(&enc).unwrap();
+        let dec: Event = json::decode(&enc).unwrap();
 
         assert_eq!(eve, dec);
         fs::remove_file("test_file1.json").unwrap();
@@ -142,7 +140,7 @@ mod tests {
         //Testing Calendar with event in it
         cal.add_event(eve.clone());
 
-        let enc = serde_json::to_string(&cal).unwrap();
+        let enc = json::encode(&cal).unwrap();
 
         let mut options = OpenOptions::new();
         options.write(true).truncate(true).create(true);
@@ -152,7 +150,7 @@ mod tests {
         let mut writer = BufWriter::new(&file);
         writer.write_all(&enc.clone().into_bytes()).unwrap();
 
-        let mut dec: Calendar = serde_json::from_str(&enc).unwrap();
+        let mut dec: Calendar = json::decode(&enc).unwrap();
 
         assert_eq!(dec.get_events_by_day(eve.start.date()).unwrap()[0].name, "TestEvent");
 
@@ -167,7 +165,7 @@ mod tests {
 
         let mut cm = CryptoManager::new();
 
-        let enc = match serde_json::to_string(&cal) {
+        let enc = match json::encode(&cal) {
             Ok(o) => o,
             Err(e) => panic!("Encryption error: {}", e.description()),
         };
