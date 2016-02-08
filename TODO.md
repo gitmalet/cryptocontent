@@ -3,6 +3,8 @@
 * ~~implement nonce saving~~
 * implement plugin management
 * implement scp/ftp/Dropbox
+* create diagrams & documentation for log management
+* implement & test log management
 
 # Crypto
 * implement symkey exchange
