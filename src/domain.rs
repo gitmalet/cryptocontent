@@ -36,11 +36,32 @@ pub struct Event {
     pub sync: bool,
 }
 
-#[derive(RustcEncodable, RustcDecodable)]
-enum EventType {
+#[derive(Debug, RustcEncodable, RustcDecodable)]
+/// Different types of entries.
+pub enum EntryType {
     Create,
     Update,
     Delete
+}
+
+#[derive(Debug, RustcEncodable, RustcDecodable)]
+/// Representation of a single entry in an Eventlog.
+pub struct EventLogEntry {
+    pub id: String,
+    pub entry_type: EntryType,
+    pub obj_id: String,
+    pub data: String
+}
+
+impl EventLogEntry {
+    pub fn new(entry_type: EntryType, obj_id: &str, data: &str) -> EventLogEntry {
+        EventLogEntry{
+            id: Uuid::new_v4().to_string(),
+            entry_type: entry_type,
+            obj_id: obj_id.to_string(),
+            data: data.to_string(),
+        }
+    }
 }
 
 /// In Calendar the Hashmaps uses DateTime<Local> as keys, because they have serde support. If
