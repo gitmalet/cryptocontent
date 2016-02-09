@@ -76,19 +76,19 @@ In this example we create 2 objects locally and make updates on 3 remote objects
 
 | Local Log | Remote Log | Shared Log |
 |---|---|---|
-| C 1234:object data | <TS_1> U 2236:changed params | |
-| C 1235:object data | <TS_2> U 4377:changed params | |
-| | <TS_3> U 1444:changed params | |
-| | <TS_4> U 2236:changed params | |
+| C 1234:object data | *TS_1* U 2236:changed params | |
+| C 1235:object data | *TS_2* U 4377:changed params | |
+| | *TS_3* U 1444:changed params | |
+| | *TS_4* U 2236:changed params | |
 
 ##### Operations on local objects
 
 | Local Log | Remote Log | Shared Log |
 |---|---|---|
-| C 1234:object data | <TS_1> U 2236:changed params | |
-| C 1235:object data | <TS_2> U 4377:changed params | |
-| U 1234:changed params | <TS_3> U 1444:changed params | |
-| U 1235:changed params | <TS_4> U 2236:changed params | |
+| C 1234:object data | *TS_1* U 2236:changed params | |
+| C 1235:object data | *TS_2* U 4377:changed params | |
+| U 1234:changed params | *TS_3* U 1444:changed params | |
+| U 1235:changed params | *TS_4* U 2236:changed params | |
 | U 1234:changed params | | |
 | D 1235: | | |
 
@@ -98,29 +98,29 @@ of object 1234 has been changed to reflect the later updates.
 
 | Local Log | Remote Log | Shared Log |
 |---|---|---|
-| C 1234:updated object data | <TS_1> U 2236:changed params | |
-| | <TS_2> U 4377:changed params | |
-| | <TS_3> U 1444:changed params | |
-| | <TS_4> U 2236:changed params | |
+| C 1234:updated object data | *TS_1* U 2236:changed params | |
+| | *TS_2* U 4377:changed params | |
+| | *TS_3* U 1444:changed params | |
+| | *TS_4* U 2236:changed params | |
 
 ##### Merge Remote Log
 
 | Local Log | Remote Log | Shared Log |
 |---|---|---|
-| C 1234:updated object data | <TS_2> U 4377:changed params | |
-| | <TS_3> U 1444:changed params | |
-| | <TS_4> U 2236:changed params | |
+| C 1234:updated object data | *TS_2* U 4377:changed params | |
+| | *TS_3* U 1444:changed params | |
+| | *TS_4* U 2236:changed params | |
 
 ##### Retrieve Shared Log
-<TS_S> represents the last saved timestamp of our device, so we are only
+*TS_S* represents the last saved timestamp of our device, so we are only
 interested in lines below this line.
 
 | Local Log | Remote Log | Shared Log |
 |---|---|---|
-| C 1234:updated object data | <TS_2> U 4377:changed params | <TS_S>
+| C 1234:updated object data | *TS_2* U 4377:changed params | *TS_S*
 U 4377:changed params|
-| | <TS_3> U 1444:changed params | <TS_5> U 2236:changed params |
-| | <TS_4> U 2236:changed params | <TS_6> U 1515:changed params|
+| | *TS_3* U 1444:changed params | *TS_5* U 2236:changed params |
+| | *TS_4* U 2236:changed params | *TS_6* U 1515:changed params|
 
 ##### Merge Remote Log and Shared Log
 Imagine the following timestamp order (smaller timestamps occurred first): TS_2
@@ -128,24 +128,24 @@ Imagine the following timestamp order (smaller timestamps occurred first): TS_2
 
 | Local Log | Remote Log | Shared Log |
 |---|---|---|
-| C 1234:updated object data | | <TS_S> U 4377:changed params|
-| | | <TS_2> U 4377:changed params |
-| | | <TS_3> U 1444:changed params |
-| | | <TS_5> U 2236:changed params |
-| | | <TS_6> U 1515:changed params|
-| | | <TS_4> U 2236:changed params |
+| C 1234:updated object data | | *TS_S* U 4377:changed params|
+| | | *TS_2* U 4377:changed params |
+| | | *TS_3* U 1444:changed params |
+| | | *TS_5* U 2236:changed params |
+| | | *TS_6* U 1515:changed params|
+| | | *TS_4* U 2236:changed params |
 
 ##### Merge Local Log and Shared Log
 Timestamp order: TS_2 < TS_3 < TS_5 < TS_6 < TS_4 < TS_7
 
 | Local Log | Remote Log | Shared Log |
 |---|---|---|
-| | | <TS_S> U 4377:changed params|
-| | | <TS_2> U 4377:changed params |
-| | | <TS_3> U 1444:changed params |
-| | | <TS_5> U 2236:changed params |
-| | | <TS_6> U 1515:changed params|
-| | | <TS_4> U 2236:changed params |
+| | | *TS_S* U 4377:changed params|
+| | | *TS_2* U 4377:changed params |
+| | | *TS_3* U 1444:changed params |
+| | | *TS_5* U 2236:changed params |
+| | | *TS_6* U 1515:changed params|
+| | | *TS_4* U 2236:changed params |
 | | | C 1234:updated object data |
 
 ### Sanitation
