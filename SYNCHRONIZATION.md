@@ -65,14 +65,14 @@ is correctly ordered by the timestamp. *Is this useful?*
 #### Example
 In this example we create 2 objects locally and make updates on 3 remote objects.
 
-1. Creation of local objects
+##### Creation of local objects
 
 | Local Log | Remote Log | Shared Log |
 |---|---|---|
 | C 1234:object data | | |
 | C 1235:object data | | |
 
-2. Update operations on remote objects
+##### Update operations on remote objects
 
 | Local Log | Remote Log | Shared Log |
 |---|---|---|
@@ -81,7 +81,7 @@ In this example we create 2 objects locally and make updates on 3 remote objects
 | | <TS_3> U 1444:changed params | |
 | | <TS_4> U 2236:changed params | |
 
-3. Operations on local objects
+##### Operations on local objects
 
 | Local Log | Remote Log | Shared Log |
 |---|---|---|
@@ -92,7 +92,7 @@ In this example we create 2 objects locally and make updates on 3 remote objects
 | U 1234:changed params | | |
 | D 1235: | | |
 
-4. Merge Local Log
+##### Merge Local Log
 Object 1235 has been deleted at the end, so we don't need to create it. Creation
 of object 1234 has been changed to reflect the later updates.
 
@@ -103,7 +103,7 @@ of object 1234 has been changed to reflect the later updates.
 | | <TS_3> U 1444:changed params | |
 | | <TS_4> U 2236:changed params | |
 
-5. Merge Remote Log
+##### Merge Remote Log
 
 | Local Log | Remote Log | Shared Log |
 |---|---|---|
@@ -111,7 +111,7 @@ of object 1234 has been changed to reflect the later updates.
 | | <TS_3> U 1444:changed params | |
 | | <TS_4> U 2236:changed params | |
 
-6. Retrieve Shared Log
+##### Retrieve Shared Log
 <TS_S> represents the last saved timestamp of our device, so we are only
 interested in lines below this line.
 
@@ -122,7 +122,7 @@ U 4377:changed params|
 | | <TS_3> U 1444:changed params | <TS_5> U 2236:changed params |
 | | <TS_4> U 2236:changed params | <TS_6> U 1515:changed params|
 
-7. Merge Remote Log and Shared Log
+##### Merge Remote Log and Shared Log
 Imagine the following timestamp order (smaller timestamps occurred first): TS_2
 < TS_3 < TS_5 < TS_6 < TS_4
 
@@ -135,7 +135,7 @@ Imagine the following timestamp order (smaller timestamps occurred first): TS_2
 | | | <TS_6> U 1515:changed params|
 | | | <TS_4> U 2236:changed params |
 
-8. Merge Local Log and Shared Log
+##### Merge Local Log and Shared Log
 Timestamp order: TS_2 < TS_3 < TS_5 < TS_6 < TS_4 < TS_7
 
 | Local Log | Remote Log | Shared Log |
