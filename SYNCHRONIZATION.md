@@ -66,19 +66,25 @@ is correctly ordered by the timestamp. *Is this useful?*
 In this example we create 2 objects locally and make updates on 3 remote objects.
 
 1. Creation of local objects
+
 | Local Log | Remote Log | Shared Log |
+|---|---|---|
 | C 1234:object data | | |
 | C 1235:object data | | |
 
 2. Update operations on remote objects
+
 | Local Log | Remote Log | Shared Log |
+|---|---|---|
 | C 1234:object data | <TS_1> U 2236:changed params | |
 | C 1235:object data | <TS_2> U 4377:changed params | |
 | | <TS_3> U 1444:changed params | |
 | | <TS_4> U 2236:changed params | |
 
 3. Operations on local objects
+
 | Local Log | Remote Log | Shared Log |
+|---|---|---|
 | C 1234:object data | <TS_1> U 2236:changed params | |
 | C 1235:object data | <TS_2> U 4377:changed params | |
 | U 1234:changed params | <TS_3> U 1444:changed params | |
@@ -89,14 +95,18 @@ In this example we create 2 objects locally and make updates on 3 remote objects
 4. Merge Local Log
 Object 1235 has been deleted at the end, so we don't need to create it. Creation
 of object 1234 has been changed to reflect the later updates.
+
 | Local Log | Remote Log | Shared Log |
+|---|---|---|
 | C 1234:updated object data | <TS_1> U 2236:changed params | |
 | | <TS_2> U 4377:changed params | |
 | | <TS_3> U 1444:changed params | |
 | | <TS_4> U 2236:changed params | |
 
 5. Merge Remote Log
+
 | Local Log | Remote Log | Shared Log |
+|---|---|---|
 | C 1234:updated object data | <TS_2> U 4377:changed params | |
 | | <TS_3> U 1444:changed params | |
 | | <TS_4> U 2236:changed params | |
@@ -104,7 +114,9 @@ of object 1234 has been changed to reflect the later updates.
 6. Retrieve Shared Log
 <TS_S> represents the last saved timestamp of our device, so we are only
 interested in lines below this line.
+
 | Local Log | Remote Log | Shared Log |
+|---|---|---|
 | C 1234:updated object data | <TS_2> U 4377:changed params | <TS_S>
 U 4377:changed params|
 | | <TS_3> U 1444:changed params | <TS_5> U 2236:changed params |
@@ -113,7 +125,9 @@ U 4377:changed params|
 7. Merge Remote Log and Shared Log
 Imagine the following timestamp order (smaller timestamps occurred first): TS_2
 < TS_3 < TS_5 < TS_6 < TS_4
+
 | Local Log | Remote Log | Shared Log |
+|---|---|---|
 | C 1234:updated object data | | <TS_S> U 4377:changed params|
 | | | <TS_2> U 4377:changed params |
 | | | <TS_3> U 1444:changed params |
@@ -123,7 +137,9 @@ Imagine the following timestamp order (smaller timestamps occurred first): TS_2
 
 8. Merge Local Log and Shared Log
 Timestamp order: TS_2 < TS_3 < TS_5 < TS_6 < TS_4 < TS_7
+
 | Local Log | Remote Log | Shared Log |
+|---|---|---|
 | | | <TS_S> U 4377:changed params|
 | | | <TS_2> U 4377:changed params |
 | | | <TS_3> U 1444:changed params |
