@@ -117,8 +117,7 @@ interested in lines below this line.
 
 | Local Log | Remote Log | Shared Log |
 |---|---|---|
-| C 1234:updated object data | *TS_2* U 4377:changed params | *TS_S*
-U 4377:changed params|
+| C 1234:updated object data | *TS_2* U 4377:changed params | *TS_S* U 4377:changed params|
 | | *TS_3* U 1444:changed params | *TS_5* U 2236:changed params |
 | | *TS_4* U 2236:changed params | *TS_6* U 1515:changed params|
 
