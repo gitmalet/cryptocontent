@@ -36,6 +36,13 @@ pub struct Event {
     pub sync: bool,
 }
 
+#[derive(RustcEncodable, RustcDecodable)]
+enum EventType {
+    Create,
+    Update,
+    Delete
+}
+
 /// In Calendar the Hashmaps uses DateTime<Local> as keys, because they have serde support. If
 /// Date<Local> gets serde support, this should be used.
 impl Calendar {
