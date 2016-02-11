@@ -241,13 +241,23 @@ mod tests {
     fn test_log() {
         let mut log = Log::new();
         let mut eve = Event::new("TestEvent", "This is a test", "There");
+        let mut sync = Event::new("Synced Event", "This is a test", "There");
+        sync.sync == true;
 
-        assert_eq!(log.len(), 0);
+        let counts = |x: &Log| (x.len(), x.count_creates(), x.count_updates(), x.count_removes());
+
+        assert_eq!(counts(&log), (0,0,0,0));
         log.add_entry(eve.clone()).unwrap();
-        assert_eq!(log.len(), 1);
+        assert_eq!(counts(&log), (1,1,0,0));
 
         eve.name = "Changed Name".to_string();
         log.add_entry(eve.clone()).unwrap();
-        assert_eq!(log.len(), 1);
+        assert_eq!(counts(&log), (1,1,0,0));
+
+        log.add_entry(sync.clone()).unwrap();
+        assert_eq!(counts(&log), (2,1,1,0));
+
+        log.add_entry(sync.clone()).unwrap();
+        assert_eq!(counts(&log), (2,1,1,0));
     }
 }
