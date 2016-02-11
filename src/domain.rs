@@ -1,4 +1,5 @@
 use std::collections::HashMap;
+use std::collections::LinkedList;
 use uuid::Uuid;
 use chrono::Date;
 use chrono::DateTime;
@@ -53,9 +54,44 @@ pub struct EventLogEntry {
     pub data: String
 }
 
+#[derive(Debug, RustcEncodable, RustcDecodable)]
+/// Representation of an Eventlog.
+pub struct EventLog {
+    pub id: String,
+    pub listpointers: HashMap<String, String>,
+    pub events: LinkedList<(String, EventLogEntry)>
+}
+
+impl EventLog {
+    /// Creates a new empty EventLog.
+    pub fn new() -> EventLog {
+        EventLog {
+            id: Uuid::new_v4().to_string(),
+            listpointers: HashMap::new(),
+            events: LinkedList::new(),
+        }
+    }
+
+    /// Creates a new EventLog from given content.
+    pub fn new_wcontent(listpointers: HashMap<String, String>,
+               events: LinkedList<(String, EventLogEntry)>) -> EventLog {
+        EventLog {
+            id: Uuid::new_v4().to_string(),
+            listpointers: listpointers,
+            events: events,
+        }
+    }
+
+    pub fn add(&self, timestamp: DateTime<Local>, entry: EventLogEntry) {
+        while((key, value) = self.events.into_iter().next().unwrap()) {
+
+        }
+    }
+}
+
 impl EventLogEntry {
     pub fn new(entry_type: EntryType, obj_id: &str, data: &str) -> EventLogEntry {
-        EventLogEntry{
+        EventLogEntry {
             id: Uuid::new_v4().to_string(),
             entry_type: entry_type,
             obj_id: obj_id.to_string(),

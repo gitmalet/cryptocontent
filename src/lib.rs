@@ -25,6 +25,7 @@ mod tests {
 
     use domain::Calendar;
     use domain::Event;
+    use domain::EventLog;
     use chrono::Duration;
     use std::fs::OpenOptions;
     use std::path::Path;
@@ -235,5 +236,10 @@ mod tests {
 
         assert_eq!(cal, loadedcal);
         fs::remove_file("test_file4.json").unwrap();
+    }
+
+    #[test]
+    fn test_eventlog() {
+        let log = EventLog::new();
     }
 }
