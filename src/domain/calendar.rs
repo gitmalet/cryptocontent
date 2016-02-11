@@ -110,6 +110,10 @@ impl Content for Calendar {
         self.id.clone()
     }
 
+    fn is_synchronised(&self) -> bool {
+        self.sync
+    }
+
     fn marshal(&self) -> Result<String, ()> {
         match json::encode(self) {
             Ok(o) => Ok(o),
@@ -158,6 +162,11 @@ impl Content for Event {
     fn get_id(&self) -> String {
         self.id.clone()
     }
+
+    fn is_synchronised(&self) -> bool {
+        self.sync
+    }
+
     fn marshal(&self) -> Result<String, ()> {
         match json::encode(self) {
             Ok(o) => Ok(o),

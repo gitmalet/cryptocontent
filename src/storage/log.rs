@@ -21,15 +21,33 @@ impl Log {
         where C: Content
     {
         let id: String = content.get_id();
-        let enc = try!(content.marshal());
-        let entry = LogEntry::new(EntryType::Create, id, enc);
+        let e = try!(content.marshal());
+        let t = {
+            let candidates: Vec<&LogEntry> = self.data.iter().filter(|x| x.obj_id == id).collect();
+
+            if candidates.len() == 0 {
+                if content.is_synchronised() {
+                    EntryType::Update
+                } else {
+                    EntryType::Create
+                }
+            } else {
+                if candidates.iter().any(|x| x.entry_type == EntryType::Create) {
+                    EntryType::Create
+                } else {
+                    EntryType::Update
+                }
+            }
+        };
+        // TODO: If t == Update, diff marshals and only log the diff
+        let entry = LogEntry::new(t, id, e);
         self.data.push_back(entry);
         Ok(())
     }
 }
 
 /// Different types of entries.
-#[derive(Debug, RustcEncodable, RustcDecodable)]
+#[derive(Debug, PartialEq, Eq, RustcEncodable, RustcDecodable)]
 pub enum EntryType {
     Create,
     Update,
