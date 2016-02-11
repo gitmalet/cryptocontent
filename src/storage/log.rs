@@ -19,6 +19,20 @@ impl Log {
         self.data.len()
     }
 
+    pub fn count_creates(&self) -> usize {
+        self.count_entry_type(EntryType::Create)
+    }
+    pub fn count_updates(&self) -> usize {
+        self.count_entry_type(EntryType::Update)
+    }
+    pub fn count_removes(&self) -> usize {
+        self.count_entry_type(EntryType::Delete)
+    }
+
+    fn count_entry_type(&self, t: EntryType) -> usize {
+        self.data.iter().filter(|x| x.entry_type == t).count()
+    }
+
     pub fn add_entry<C>(&mut self, content: C) -> Result<(), ()>
         where C: Content
     {
