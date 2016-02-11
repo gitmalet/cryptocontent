@@ -160,6 +160,7 @@ use std::io::Read;
 use crypto::CryptoManager;
 use rustc_serialize::{Encodable, Decodable, json};
 
+pub mod log;
 pub fn save<W: Write, S: Encodable>(w: &mut W, c: &mut CryptoManager, s: &S) {
     let enc = json::encode(s).unwrap();
 

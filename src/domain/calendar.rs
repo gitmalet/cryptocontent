@@ -5,10 +5,7 @@ use chrono::DateTime;
 use chrono::Local;
 use chrono::Duration;
 
-pub struct Account {
-    pub items: Vec<Calendar>
-}
-
+use domain::Content;
 
 /// This struct is used to store information about a single calendar,
 /// including the events in it.
@@ -36,38 +33,9 @@ pub struct Event {
     pub sync: bool,
 }
 
-#[derive(Debug, RustcEncodable, RustcDecodable)]
-/// Different types of entries.
-pub enum EntryType {
-    Create,
-    Update,
-    Delete
-}
-
-#[derive(Debug, RustcEncodable, RustcDecodable)]
-/// Representation of a single entry in an Eventlog.
-pub struct EventLogEntry {
-    pub id: String,
-    pub entry_type: EntryType,
-    pub obj_id: String,
-    pub data: String
-}
-
-impl EventLogEntry {
-    pub fn new(entry_type: EntryType, obj_id: &str, data: &str) -> EventLogEntry {
-        EventLogEntry{
-            id: Uuid::new_v4().to_string(),
-            entry_type: entry_type,
-            obj_id: obj_id.to_string(),
-            data: data.to_string(),
-        }
-    }
-}
-
 /// In Calendar the Hashmaps uses DateTime<Local> as keys, because they have serde support. If
 /// Date<Local> gets serde support, this should be used.
 impl Calendar {
-
     /// Function to create a new Calendar struct with name and description.
     /// The sync bit is there to determine if this calendar is to be synced with online storage or
     /// not.
@@ -116,7 +84,7 @@ impl Calendar {
         let date = e.start.date().clone().and_hms(0, 0, 0).to_string();
 
         if !(self.days.contains_key(&date)) {
-            return
+            return;
         }
 
         let index = match self.days.get(&date).unwrap().iter().position(|x| x.id == e.id) {
@@ -136,6 +104,11 @@ impl Calendar {
     }
 }
 
+impl Content for Calendar {
+    fn get_id(&self) -> String {
+        self.id.clone()
+    }
+}
 
 impl Event {
     pub fn new(name: &str, desc: &str, location: &str) -> Event {
@@ -163,5 +136,11 @@ impl Event {
             end: self.start + distance + (self.end - self.start),
             sync: false,
         }
+    }
+}
+
+impl Content for Event {
+    fn get_id(&self) -> String {
+        self.id.clone()
     }
 }

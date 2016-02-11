@@ -23,8 +23,8 @@ pub mod storage;
 #[cfg(test)]
 mod tests {
 
-    use domain::Calendar;
-    use domain::Event;
+    use domain::calendar::Calendar;
+    use domain::calendar::Event;
     use chrono::Duration;
     use std::fs::OpenOptions;
     use std::path::Path;
@@ -35,6 +35,7 @@ mod tests {
     use std::error::Error;
     use std::fs;
     use storage::{load, save};
+    use storage::log::Log;
     use rustc_serialize::json;
 
     #[test]
@@ -45,17 +46,16 @@ mod tests {
         assert!(cal.sync == true);
     }
 
-
     #[test]
     fn test_event() {
-        let eve = Event::new("TestEvent", "This is a test instance for event", "There");
+        let eve = Event::new("TestEvent", "This is a test instance", "There");
         assert!(eve.name == "TestEvent");
-        assert!(eve.desc == "This is a test instance for event");
+        assert!(eve.desc == "This is a test instance");
         assert!(eve.location == "There");
 
         let e2 = eve.repeat(Duration::weeks(1));
         assert!(e2.name == "TestEvent");
-        assert!(e2.desc == "This is a test instance for event");
+        assert!(e2.desc == "This is a test instance");
         assert!(e2.location == "There");
 
         assert_eq!(e2.start - eve.start, Duration::weeks(1));
@@ -235,5 +235,15 @@ mod tests {
 
         assert_eq!(cal, loadedcal);
         fs::remove_file("test_file4.json").unwrap();
+    }
+
+    #[test]
+    fn test_log() {
+        let mut log = Log::new();
+        let eve = Event::new("TestEvent", "This is a test", "There");
+
+        assert_eq!(log.len(), 0);
+        log.add_entry(eve).unwrap();
+        assert_eq!(log.len(), 1);
     }
 }
