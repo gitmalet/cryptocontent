@@ -1,6 +1,8 @@
 use std::collections::LinkedList;
+use std::mem;
 use chrono::DateTime;
 use chrono::Local;
+
 use domain::Content;
 
 #[derive(Debug, RustcEncodable, RustcDecodable)]
@@ -40,6 +42,13 @@ impl Log {
             }
         };
         // TODO: If t == Update, diff marshals and only log the diff
+        if t == EntryType::Create {
+            self.data = self.data
+                            .iter()
+                            .filter(|x| x.obj_id != id)
+                            .cloned()
+                            .collect::<LinkedList<LogEntry>>();
+        }
         let entry = LogEntry::new(t, id, e);
         self.data.push_back(entry);
         Ok(())
@@ -47,7 +56,7 @@ impl Log {
 }
 
 /// Different types of entries.
-#[derive(Debug, PartialEq, Eq, RustcEncodable, RustcDecodable)]
+#[derive(Debug, Clone, Copy, PartialEq, Eq, RustcEncodable, RustcDecodable)]
 pub enum EntryType {
     Create,
     Update,
@@ -55,7 +64,7 @@ pub enum EntryType {
 }
 
 /// Representation of a single entry in an Eventlog.
-#[derive(Debug, RustcEncodable, RustcDecodable)]
+#[derive(Debug, Clone, RustcEncodable, RustcDecodable)]
 pub struct LogEntry {
     pub time: DateTime<Local>,
     pub entry_type: EntryType,

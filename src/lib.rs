@@ -240,10 +240,14 @@ mod tests {
     #[test]
     fn test_log() {
         let mut log = Log::new();
-        let eve = Event::new("TestEvent", "This is a test", "There");
+        let mut eve = Event::new("TestEvent", "This is a test", "There");
 
         assert_eq!(log.len(), 0);
-        log.add_entry(eve).unwrap();
+        log.add_entry(eve.clone()).unwrap();
+        assert_eq!(log.len(), 1);
+
+        eve.name = "Changed Name".to_string();
+        log.add_entry(eve.clone()).unwrap();
         assert_eq!(log.len(), 1);
     }
 }
