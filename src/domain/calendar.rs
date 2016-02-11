@@ -4,6 +4,7 @@ use chrono::Date;
 use chrono::DateTime;
 use chrono::Local;
 use chrono::Duration;
+use rustc_serialize::json;
 
 use domain::Content;
 
@@ -108,6 +109,20 @@ impl Content for Calendar {
     fn get_id(&self) -> String {
         self.id.clone()
     }
+
+    fn marshal(&self) -> Result<String, ()> {
+        match json::encode(self) {
+            Ok(o) => Ok(o),
+            Err(e) => Err(()),
+        }
+    }
+
+    fn unmarshal(string: &str) -> Result<Calendar, ()> {
+        match json::decode(string) {
+            Ok(o) => Ok(o),
+            Err(e) => Err(()),
+        }
+    }
 }
 
 impl Event {
@@ -142,5 +157,18 @@ impl Event {
 impl Content for Event {
     fn get_id(&self) -> String {
         self.id.clone()
+    }
+    fn marshal(&self) -> Result<String, ()> {
+        match json::encode(self) {
+            Ok(o) => Ok(o),
+            Err(e) => Err(()),
+        }
+    }
+
+    fn unmarshal(string: &str) -> Result<Event, ()> {
+        match json::decode(string) {
+            Ok(o) => Ok(o),
+            Err(e) => Err(()),
+        }
     }
 }

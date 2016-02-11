@@ -2,8 +2,6 @@ use std::collections::LinkedList;
 use chrono::DateTime;
 use chrono::Local;
 use domain::Content;
-use rustc_serialize::json;
-use rustc_serialize::json::EncoderError;
 
 #[derive(Debug, RustcEncodable, RustcDecodable)]
 pub struct Log {
@@ -19,11 +17,11 @@ impl Log {
         self.data.len()
     }
 
-    pub fn add_entry<C>(&mut self, content: C) -> Result<(), EncoderError>
+    pub fn add_entry<C>(&mut self, content: C) -> Result<(), ()>
         where C: Content
     {
         let id: String = content.get_id();
-        let enc = try!(json::encode(&content));
+        let enc = try!(content.marshal());
         let entry = LogEntry::new(EntryType::Create, id, enc);
         self.data.push_back(entry);
         Ok(())

@@ -4,11 +4,12 @@ use rustc_serialize::Encodable;
 
 use domain::calendar::Calendar;
 
-#[derive(Debug, RustcEncodable, RustcDecodable)]
 pub struct Account {
-    pub items: Vec<Calendar>,
+    pub items: Vec<Box<Content>>,
 }
 
-pub trait Content : Encodable {
+pub trait Content {
     fn get_id(&self) -> String;
+    fn marshal(&self) -> Result<String, ()>;
+    fn unmarshal(&str) -> Result<Self, ()> where Self: Sized;
 }
