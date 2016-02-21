@@ -37,19 +37,11 @@ impl Log {
     {
         let id: String = content.get_id();
         let e = try!(content.marshal());
-        let t = {
-            let candidates: Vec<&LogEntry> = self.data.iter().filter(|x| x.obj_id == id).collect();
-            let creates = candidates.iter().any(|x| x.entry_type == EntryType::Create);
-
-            match candidates.len() {
-                l if l == 0 && content.is_synchronised() => EntryType::Update,
-                l if l == 0 && !(content.is_synchronised()) => EntryType::Create,
-                l if l > 0 && creates => EntryType::Create,
-                l if l > 0 && !(creates) => EntryType::Update,
-                _ => unreachable!(),
-            }
-
+        let t = match content.is_synchronised() {
+            true => EntryType::Update,
+            false => EntryType::Create,
         };
+
         // If Create, delete all old entrys from the local log because they are invalid
         if t == EntryType::Create {
             self.data = self.data

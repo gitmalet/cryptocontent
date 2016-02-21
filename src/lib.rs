@@ -241,8 +241,8 @@ mod tests {
     fn test_log() {
         let mut log = Log::new();
         let mut eve = Event::new("TestEvent", "This is a test", "There");
-        let sync = Event::new("Synced Event", "This is a test", "There");
-        sync.sync == true;
+        let mut sync = Event::new("Synced Event", "This is a test", "There");
+        sync.sync = true;
 
         #[derive(Debug, PartialEq, Eq)]
         struct Counts {
