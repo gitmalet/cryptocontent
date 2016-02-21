@@ -241,23 +241,49 @@ mod tests {
     fn test_log() {
         let mut log = Log::new();
         let mut eve = Event::new("TestEvent", "This is a test", "There");
-        let mut sync = Event::new("Synced Event", "This is a test", "There");
+        let sync = Event::new("Synced Event", "This is a test", "There");
         sync.sync == true;
 
-        let counts = |x: &Log| (x.len(), x.count_creates(), x.count_updates(), x.count_removes());
+        #[derive(Debug, PartialEq, Eq)]
+        struct Counts {
+            all: usize,
+            creates: usize,
+            updates: usize,
+            removes: usize,
+        }
 
-        assert_eq!(counts(&log), (0,0,0,0));
+        impl Counts {
+            fn new(log: &Log) -> Counts {
+                Counts {
+                    all: log.len(),
+                    creates: log.count_creates(),
+                    updates: log.count_updates(),
+                    removes: log.count_removes(),
+                }
+            }
+
+            fn from_numbers(all: usize, creates: usize, updates: usize, removes: usize) -> Counts {
+                Counts {
+                    all: all,
+                    creates: creates,
+                    updates: updates,
+                    removes: removes,
+                }
+            }
+        }
+
+        assert_eq!(Counts::new(&log), Counts::from_numbers(0,0,0,0));
         log.add_entry(eve.clone()).unwrap();
-        assert_eq!(counts(&log), (1,1,0,0));
+        assert_eq!(Counts::new(&log), Counts::from_numbers(1,1,0,0));
 
         eve.name = "Changed Name".to_string();
         log.add_entry(eve.clone()).unwrap();
-        assert_eq!(counts(&log), (1,1,0,0));
+        assert_eq!(Counts::new(&log), Counts::from_numbers(1,1,0,0));
 
         log.add_entry(sync.clone()).unwrap();
-        assert_eq!(counts(&log), (2,1,1,0));
+        assert_eq!(Counts::new(&log), Counts::from_numbers(2,1,1,0));
 
         log.add_entry(sync.clone()).unwrap();
-        assert_eq!(counts(&log), (2,1,1,0));
+        assert_eq!(Counts::new(&log), Counts::from_numbers(2,1,1,0));
     }
 }

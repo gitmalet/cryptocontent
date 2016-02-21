@@ -1,5 +1,4 @@
 use std::collections::LinkedList;
-use std::mem;
 use chrono::DateTime;
 use chrono::Local;
 
@@ -40,28 +39,27 @@ impl Log {
         let e = try!(content.marshal());
         let t = {
             let candidates: Vec<&LogEntry> = self.data.iter().filter(|x| x.obj_id == id).collect();
+            let creates = candidates.iter().any(|x| x.entry_type == EntryType::Create);
 
-            if candidates.len() == 0 {
-                if content.is_synchronised() {
-                    EntryType::Update
-                } else {
-                    EntryType::Create
-                }
-            } else {
-                if candidates.iter().any(|x| x.entry_type == EntryType::Create) {
-                    EntryType::Create
-                } else {
-                    EntryType::Update
-                }
+            match candidates.len() {
+                l if l == 0 && content.is_synchronised() => EntryType::Update,
+                l if l == 0 && !(content.is_synchronised()) => EntryType::Create,
+                l if l > 0 && creates => EntryType::Create,
+                l if l > 0 && !(creates) => EntryType::Update,
+                _ => unreachable!(),
             }
+
         };
-        // TODO: If t == Update, diff marshals and only log the diff
+        // If Create, delete all old entrys from the local log because they are invalid
         if t == EntryType::Create {
             self.data = self.data
                             .iter()
                             .filter(|x| x.obj_id != id)
                             .cloned()
                             .collect::<LinkedList<LogEntry>>();
+        }
+        // TODO: If Update, diff marshals and only log the diff
+        if t == EntryType::Update {
         }
         let entry = LogEntry::new(t, id, e);
         self.data.push_back(entry);
