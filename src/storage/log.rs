@@ -50,7 +50,7 @@ impl Log {
                             .cloned()
                             .collect::<LinkedList<LogEntry>>();
         }
-        // TODO: If Update, diff marshals and only log the diff
+        // TODO: If Update, diff marshals and only log the diff and delete old updates
         if t == EntryType::Update {
         }
         let entry = LogEntry::new(t, id, e);
